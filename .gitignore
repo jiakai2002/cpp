@@ -1,0 +1,48 @@
+# ---------------------------
+# General system files
+# ---------------------------
+.DS_Store       # macOS Finder metadata
+Thumbs.db       # Windows Explorer metadata
+
+# ---------------------------
+# Build artifacts
+# ---------------------------
+*.o             # object files
+*.obj           # Windows object files
+*.so            # shared libraries
+*.dylib         # macOS shared libraries
+*.dll           # Windows dynamic libraries
+*.a             # static libraries
+*.exe           # compiled executables
+*.out           # compiled output (Linux/macOS)
+*.app           # macOS app bundles
+
+# ---------------------------
+# IDE / Editor files
+# ---------------------------
+.vscode/        # VSCode workspace settings
+*.code-workspace
+*.idea/         # CLion, IntelliJ
+*.iml           # IntelliJ project files
+*.swp           # Vim swap files
+*~              # temporary editor files
+
+# ---------------------------
+# CMake / Build directories
+# ---------------------------
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# ---------------------------
+# Google Test / Third-party
+# ---------------------------
+googletest/     # if cloned locally
+
+# ---------------------------
+# Logs and temp files
+# ---------------------------
+*.log
+*.tmp
