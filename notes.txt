@@ -1,0 +1,26 @@
+noexcept
+- tells compiler this function won't throw exception
+- terminate if do throw
+why?
+make compiler faster
+for move operations so T doesnt fall back to copy
+
+const T& (read-only alias to avoid accidental modification)
+
+new = allocate + construct
+delete = call destructor + free
+
+operator new = allocate
+operator delete = free
+
+placement new = place element in allocated memory
+
+shared_ptr
+normal construction does two allocations - object and ref_count
+make_shared does one single allocation
+
+friend class to share private members
+
+explicit keyword for single arg constructor to prevent accidental implicit conversion
+shared_ptr<int> sp(cb);  //OK
+shared_ptr<int> sp = cb; //cannot implicitly convert
