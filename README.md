@@ -63,8 +63,3 @@ Heap-managed char array with null terminator and dynamic growth.
 - Capacity doubles on `push_back`; `shrink_to_fit` reallocates to exactly `size`
 - Null terminator maintained manually after every mutation
 - Copy-and-swap idiom (copy/move construct + swap) offers stronger exception safety as an alternative assignment strategy
-
----
-
-## Testing
-Each structure has a `test.cpp` covering construction, copy/move semantics, and edge cases.
