@@ -1,59 +1,70 @@
-# C++ Custom Implementations
+# C++ Data Structures & Smart Pointers
 
-Custom implementations of core C++ data structures and smart pointers from scratch, with manual memory management and full test coverage via Google Test.
+Custom implementations from scratch with manual memory management, tested with Google Test.
 
 ---
 
 ## `unique_ptr<T>`
+Single-ownership smart pointer — copy deleted, move only.
 
-A smart pointer enforcing single ownership — copy is deleted, only move is allowed.
+**Operations:** constructor, destructor, move constructor/assignment, `reset`, `release`, `swap`, `get`, `operator*/->/bool`
 
-**Implemented:** Default constructor, raw pointer constructor, destructor, move constructor, move assignment, `reset`, `release`, `swap`, `get`, `operator*`, `operator->`, `operator bool`
-
-**Key learnings:** Deleting copy operations at the compiler level enforces ownership semantics. `release()` transfers raw pointer ownership without destroying the resource, while `reset()` destroys the old resource before taking a new one. Using `explicit` on the constructor prevents accidental implicit conversions from raw pointers.
+**Notes:**
+- Copy deleted at compiler level to enforce single ownership
+- `explicit` constructor prevents accidental implicit conversion from raw pointers
+- `release()` transfers ownership without destroying; `reset()` destroys then takes new pointer
+- `delete` = destructor + free; used directly since unique_ptr does a single allocation
 
 ---
 
-## `shared_ptr<T>` / `weak_ptr<T>`
+## `shared_ptr<T>` + `weak_ptr<T>`
+Reference-counted shared ownership via a single `ControlBlock<T>` holding the object + strong/weak counts.
 
-Reference-counted shared ownership using a unified `ControlBlock<T>` that holds the object, strong count, and weak count in a single heap allocation.
+**Operations:** constructor, destructor, copy/move constructor/assignment, `reset`, `swap`, `use_count`, `unique`, `make_shared`; `weak_ptr`: `lock`, `expired`
 
-**Implemented:** Default constructor, control block constructor, copy/move constructors and assignments, destructor, `reset`, `swap`, `get`, `use_count`, `unique`, `operator bool`, `make_shared`; `weak_ptr` with `lock`, `expired`, `use_count`, copy/move
-
-**Key learnings:** `make_shared` does a single allocation (object + ref counts together) vs. two separate allocations in a naive implementation. The control block outlives the object — it's only freed when both strong and weak counts hit zero. `weak_ptr::lock()` safely promotes to a `shared_ptr` only if the object is still alive, avoiding dangling pointer access.
+**Notes:**
+- Normal construction = two allocations (object + ref count); `make_shared` fuses them into one
+- Control block outlives the object — freed only when both strong and weak counts reach zero
+- `weak_ptr::lock()` safely promotes to `shared_ptr` only if the object is still alive
+- `friend class` used to give `weak_ptr` and `make_shared` access to `shared_ptr`'s private members
+- `return *this` in `operator=` enables assignment chaining (`a = b = c`)
 
 ---
 
 ## `vector<T>`
+Dynamic array using raw memory with placement new and 2× growth on reallocation.
 
-A dynamic array using raw memory (`operator new`/`operator delete`) with placement new for in-place construction, doubling capacity on reallocation.
+**Operations:** constructor, destructor, copy/move constructor/assignment, `push_back` (copy & move), `pop`, `operator[]`, `getSize/Capacity`, iterator
 
-**Implemented:** Default constructor, sized constructor, copy/move constructors and assignments, destructor, `push_back` (copy & move), `pop`, `operator[]`, `getSize`, `getCapacity`, iterator
-
-**Key learnings:** Separating allocation (`operator new`) from construction (placement `new`) avoids calling default constructors on uninitialized memory. During reallocation, existing elements are move-constructed into new memory then explicitly destroyed in the old buffer — this is both exception-aware and avoids unnecessary copies. Elements must be manually destroyed via `~T()` before freeing raw memory.
+**Notes:**
+- `operator new` = allocate only; placement `new` = construct in existing memory — avoids unnecessary default construction
+- On reallocation, elements are move-constructed into new memory then explicitly destroyed via `~T()` in the old buffer
+- `noexcept` on move operations prevents the compiler from falling back to copy
 
 ---
 
 ## `list<T>`
+Doubly linked list of heap-allocated nodes with bidirectional iteration.
 
-A doubly linked list of heap-allocated `Node` structs with `head`/`tail` sentinels and bidirectional iteration.
+**Operations:** constructor, destructor, `push/pop_back/front` (copy & move), `insert`, `erase`, `clear`, `swap`, `size`, `empty`, bidirectional iterator
 
-**Implemented:** Default constructor, destructor, `push_back`/`push_front` (copy & move), `pop_back`/`pop_front`, `insert`, `erase`, `clear`, `swap`, `size`, `empty`, bidirectional iterator
-
-**Key learnings:** Each node is independently heap-allocated, so no reallocation is needed on insert/erase — only pointer rewiring. `clear()` walks the chain and deletes each node individually. The iterator wraps a raw `Node*` and implements `operator*`, `operator++`/`--`, and `operator!=` to slot into range-based for loops.
+**Notes:**
+- No reallocation on insert/erase — only pointer rewiring
+- Iterator is a pointer wrapper implementing `*`, `++/--`, `!=` to plug into range-based for loops
 
 ---
 
 ## `string`
+Heap-managed char array with null terminator and dynamic growth.
 
-A heap-managed character array with null terminator, supporting dynamic growth and common string operations.
+**Operations:** constructor, destructor, copy/move constructor/assignment, `push/pop_back`, `append`, `reserve`, `shrink_to_fit`, `clear`, `find`, `substr`, `compare`, `at`, `operator[]`, `c_str`, `empty`
 
-**Implemented:** Default constructor, C-string constructor, copy/move constructors and assignments, destructor, `push_back`, `pop_back`, `append`, `reserve`, `shrink_to_fit`, `clear`, `find` (char & substring), `substr`, `compare`, `at`, `operator[]`, `c_str`, `empty`
-
-**Key learnings:** Capacity doubles on `push_back` to amortize reallocation cost. `shrink_to_fit` reallocates to exactly `size` to reclaim unused memory. `find` uses a naive O(n·m) substring scan — sufficient for this implementation. The null terminator is maintained manually after every mutation. Copy-and-swap idiom (commented out) is noted as an alternative for strong exception safety.
+**Notes:**
+- Capacity doubles on `push_back`; `shrink_to_fit` reallocates to exactly `size`
+- Null terminator maintained manually after every mutation
+- Copy-and-swap idiom (copy/move construct + swap) offers stronger exception safety as an alternative assignment strategy
 
 ---
 
 ## Testing
-
-All structures are tested with [Google Test](https://github.com/google/googletest). Each `.hpp` has a corresponding `test.cpp` covering construction, copy/move semantics, edge cases, and memory safety.
+Each structure has a `test.cpp` covering construction, copy/move semantics, and edge cases.
