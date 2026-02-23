@@ -29,6 +29,19 @@ private:
 	}
 
 public:
+	// Iterator - pointer wrapper to support iterator for-loop 
+	struct iterator {
+        T* ptr;
+        iterator(T* p) : ptr(p) {}
+        T& operator*() { return *ptr; }
+        iterator& operator++() { ++ptr; return *this; }
+        iterator& operator--() { --ptr; return *this; }
+        bool operator!=(const iterator& other) const { return ptr != other.ptr; }
+    };
+
+	iterator begin() { return iterator(data); }
+    iterator end() { return iterator(data + size); }
+
 	// 1) Constructors
 	// Default Constructor
 	vector() : data(nullptr), size(0), capacity(0) {}

@@ -24,3 +24,10 @@ friend class to share private members
 explicit keyword for single arg constructor to prevent accidental implicit conversion
 shared_ptr<int> sp(cb);  //OK
 shared_ptr<int> sp = cb; //cannot implicitly convert
+
+return ref for operator=() allows chaining a=b=c
+a=b -> a.operator=(b)
+
+copy-and-swap for exception safety
+
+iterator - pointer wrapper to support for loop
